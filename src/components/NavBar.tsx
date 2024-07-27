@@ -8,10 +8,10 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({ logoHref, userAvatarSrc }) => {
   return (
-    <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
+    <nav className="bg-gray-900 text-white p-4 flex justify-between items-center">
       <a href={logoHref ?? "#"} className="flex items-center">
         <FaReact className="text-3xl mr-2" /> {/* Logo icon */}
-        <span className="font-bold text-xl">Logo</span>
+        <span className="font-bold text-xl">Logos</span>
       </a>
       <div className="flex items-center">
         {userAvatarSrc ? (
