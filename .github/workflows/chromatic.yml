@@ -1,0 +1,64 @@
+name: "Chromatic"
+
+on: push
+
+jobs:
+  cypress:
+    name: Run Cypress
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/browsers:node-20.15.1-chrome-126.0.6478.126-1-ff-128.0-edge-126.0.2592.102-1
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        # ⚠️ See your package manager's documentation for the correct command to install dependencies in a CI environment.
+        run: npm ci
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        env:
+          ELECTRON_EXTRA_LAUNCH_ARGS: "--remote-debugging-port=9222"
+        with: 
+          start: npm run dev
+      - uses: actions/upload-artifact@v4
+        with:
+          # Chromatic automatically defaults to the cypress/downloads directory. 
+          # Replace with the path to your custom directory and adjust the CHROMATIC_ARCHIVE_LOCATION environment variable accordingly.
+          name: test-results
+          path: ./cypress/downloads
+          retention-days: 30
+  chromatic:
+    name: Run Chromatic
+    needs: cypress
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        # ⚠️ See your package manager's documentation for the correct command to install dependencies in a CI environment.
+        run: npm ci
+      - name: Download Cypress test results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          path: ./cypress/downloads
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          # ⚠️ Enable Cypress
+          cypress: true
+          # ⚠️ Make sure to configure a `CHROMATIC_PROJECT_TOKEN` repository secret
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        # ⚠️ Optionally configure the archive location with env vars
+        env:
+          CHROMATIC_ARCHIVE_LOCATION: ./cypress/downloads
