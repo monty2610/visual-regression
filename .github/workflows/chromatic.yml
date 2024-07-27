@@ -30,7 +30,7 @@ jobs:
           # Chromatic automatically defaults to the cypress/downloads directory. 
           # Replace with the path to your custom directory and adjust the CHROMATIC_ARCHIVE_LOCATION environment variable accordingly.
           name: test-results
-          path: ./cypress/downloads
+          path: cypress/downloads
           retention-days: 30
   chromatic:
     name: Run Chromatic
